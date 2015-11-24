@@ -1,3 +1,46 @@
 body {
     text-align: center;
+    font-family: 'VT323', sans-serif ;
+    background-color: #62825b;
+    background: url(../images/background.jpg) no-repeat;
+    background-size: cover;
+}
+
+#end {
+	display: none;
+	font-size: 50px;
+	position: absolute;
+    width: 400px;
+    height: 400px;
+    background: #fff;
+    border: 20px solid #bbb;
+    text-align: center;
+    top: 192px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+}
+
+#score, #lives {
+	font-size: 50px;
+	color: #444;
+}
+
+#lives {
+	color: #d81313;
+}
+
+#final-score {
+	display: block;
+    margin-top: 34px;
+    font-size: 107px;
+}
+
+.play-again {
+	background: #eA0238;
+	cursor: pointer;
+    color: #fff;
+    width: 271px;
+    margin: 54px auto 0;
+    padding: 7px 0;
 }

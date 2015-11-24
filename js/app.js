@@ -16,8 +16,7 @@ Enemy.prototype.update = function(dt) {
         && this.x < player.x + 101
         && this.y === player.y
         ) {
-        player.x = 401;
-        player.y = 400;
+        player.reset();
         playAudio('collision');
 
         // Lose one life when there's a collision with the player
@@ -36,20 +35,20 @@ Enemy.prototype.render = function() {
 };
 
 var Player = function(x, y) {
-    this.x = x;
-    this.y = y;
+    this.x = 202;
+    this.y = 400;
     this.sprite = 'images/char-boy.png';
     this.score = 0;
     this.lives = 5;
 
-    var HTMLscore = document.createElement('h2');
-    var scoreText = document.createTextNode("Score: " + this.score );
+    var HTMLscore = document.createElement('div');
+    var scoreText = document.createTextNode("SCORE: " + this.score );
     HTMLscore.setAttribute('id', 'score');
     HTMLscore.appendChild(scoreText);
     document.body.appendChild(HTMLscore);
 
     var HTMLlives = document.createElement('div');
-    var livesText = document.createTextNode("Lives: " + this.lives);
+    var livesText = document.createTextNode("LIVES: " + this.lives);
     HTMLlives.setAttribute('id', 'lives');
     HTMLlives.appendChild(livesText);
     document.body.appendChild(HTMLlives);
@@ -63,7 +62,7 @@ Player.prototype.update = function() {
 
     // Control events after player gets into water
     if (this.y < 60) {
-        this.y = 400;
+        this.reset();
         playAudio('water');
 
         // Lose one life
@@ -77,19 +76,32 @@ Player.prototype.render = function() {
 
 Player.prototype.scoreUpdate = function(points) {
     var newScore = this.score += points;
-    document.getElementById('score').firstChild.nodeValue = 'Score: ' + newScore;
+    document.getElementById('score').firstChild.nodeValue = 'SCORE: ' + newScore;
 };
 
 Player.prototype.livesUpdate = function() {
     this.lives--;
     console.log(this.lives);
-    document.getElementById('lives').firstChild.nodeValue = 'Lives: ' + this.lives;
+    document.getElementById('lives').firstChild.nodeValue = 'LIVES: ' + this.lives;
     if (this.lives === 0) {
         playAudio('win');
+
+        // Remove player, gems and enemies
         gem.x = undefined;
         gem.y = undefined;
+        player.x = undefined;
+        player.y = undefined;
         allEnemies = [];
+
+        // Display message with score and option to play again
+        document.getElementById('end').style.display = 'block';
+        document.getElementById('final-score').innerHTML = this.score;
     }
+};
+
+Player.prototype.reset = function() {
+    this.x = 202;
+    this.y = 400;
 };
 
 Player.prototype.handleInput = function(key) {
@@ -154,10 +166,23 @@ var playAudio = function(type) {
     myAudio.play();
 };
 
+var playAgain = function() {
+    document.getElementById('end').style.display = 'none';
+    for (var i = 0; i < 4; i++) {
+        allEnemies.push(new Enemy(i));
+    }
+    player.reset();
+    gem.x = Math.floor(Math.random() * (5-1) +1) * 101;
+    gem.y = Math.floor(Math.random() * (4 - 0)) * 85 + 60;
+    document.getElementById('score').firstChild.nodeValue = 'SCORE: 0';
+    document.getElementById('lives').firstChild.nodeValue = 'LIVES: 5';
+    player.score = 0;
+    player.lives = 5;
+};
 
 
 var allEnemies = [];
-var player = new Player(404,400);
+var player = new Player();
 var gem = new Gem();
 for (var i = 0; i < 4; i++) {
     allEnemies.push(new Enemy(i));
