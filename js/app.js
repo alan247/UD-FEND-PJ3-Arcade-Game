@@ -1,3 +1,17 @@
+var playAudio = function(type) {
+    var myAudio = document.createElement("audio");
+    switch (type) {
+        case ('collision') :
+            myAudio.src = 'sounds/hurt.wav';
+            break;
+        case ('gem') :
+            myAudio.src = 'sounds/gem.wav';
+            break;
+    }
+    myAudio.play();
+};
+
+// Enemy
 var Enemy = function(rowCount) {
     this.x = -202;
     this.y = rowCount * 85 + 60;
@@ -17,10 +31,11 @@ Enemy.prototype.update = function(dt) {
         ) {
         player.x = 401;
         player.y = 400;
+        playAudio('collision');
     }
 
     // Return enemies when end of canvas reached
-    if (this.x > 808) this.x = -101;
+    if (this.x > 505) this.x = -202;
 };
 
 // Draw the enemy on the screen, required method for game
@@ -36,7 +51,7 @@ var Player = function(x, y) {
 
 Player.prototype.update = function() {
     // Prevent player from going off the canvas
-    if (this.x > 705) this.x = 705;
+    if (this.x > 404) this.x = 404;
     if (this.x < 0) this.x = 0;
     if (this.y < -25) this.y = -25;
     if (this.y > 400) this.y = 400;
@@ -64,11 +79,35 @@ Player.prototype.handleInput = function(key) {
     }
 };
 
+var Gem = function () {
+    this.x = Math.floor(Math.random() * (5-1) +1) * 101;
+    this.y = Math.floor(Math.random() * (4 - 0)) * 85 + 60;
+    this.sprite = 'images/gem-blue.png';
+};
+
+Gem.prototype.update = function() {
+
+    // Collision management
+    if (this.x > player.x - 80
+        && this.x < player.x + 101
+        && this.y === player.y
+        ) {
+        playAudio('gem');
+        this.x = undefined;
+        this.y = undefined;
+        gem = new Gem();
+    }
+}
+
+Gem.prototype.render = function () {
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+};
+
 var allEnemies = [];
 var player = new Player(404,400);
 var enemy = new Enemy(0, 135);
 var enemy2 = new Enemy(50, 135)
-
+var gem = new Gem();
 for (var i = 0; i < 4; i++) {
     allEnemies.push(new Enemy(i));
 }
