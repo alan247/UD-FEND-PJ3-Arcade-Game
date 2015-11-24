@@ -19,7 +19,12 @@ Enemy.prototype.update = function(dt) {
         player.x = 401;
         player.y = 400;
         playAudio('collision');
+
+        // Lose one life when there's a collision with the player
+        player.livesUpdate();
     }
+
+
 
     // Return enemies when end of canvas reached
     if (this.x > 505) this.x = -202;
@@ -35,12 +40,19 @@ var Player = function(x, y) {
     this.y = y;
     this.sprite = 'images/char-boy.png';
     this.score = 0;
+    this.lives = 5;
 
-    var h2 = document.createElement('h2');
-    var text = document.createTextNode("Score: " + this.score);
-    h2.setAttribute('id', 'score');
-    h2.appendChild(text);
-    document.body.appendChild(h2);
+    var HTMLscore = document.createElement('h2');
+    var scoreText = document.createTextNode("Score: " + this.score );
+    HTMLscore.setAttribute('id', 'score');
+    HTMLscore.appendChild(scoreText);
+    document.body.appendChild(HTMLscore);
+
+    var HTMLlives = document.createElement('div');
+    var livesText = document.createTextNode("Lives: " + this.lives);
+    HTMLlives.setAttribute('id', 'lives');
+    HTMLlives.appendChild(livesText);
+    document.body.appendChild(HTMLlives);
 };
 
 Player.prototype.update = function() {
@@ -53,6 +65,9 @@ Player.prototype.update = function() {
     if (this.y < 60) {
         this.y = 400;
         playAudio('water');
+
+        // Lose one life
+        player.livesUpdate();
     }
 };
 
@@ -63,6 +78,18 @@ Player.prototype.render = function() {
 Player.prototype.scoreUpdate = function(points) {
     var newScore = this.score += points;
     document.getElementById('score').firstChild.nodeValue = 'Score: ' + newScore;
+};
+
+Player.prototype.livesUpdate = function() {
+    this.lives--;
+    console.log(this.lives);
+    document.getElementById('lives').firstChild.nodeValue = 'Lives: ' + this.lives;
+    if (this.lives === 0) {
+        playAudio('win');
+        gem.x = undefined;
+        gem.y = undefined;
+        allEnemies = [];
+    }
 };
 
 Player.prototype.handleInput = function(key) {
@@ -119,6 +146,9 @@ var playAudio = function(type) {
             break;
         case ('water') :
             myAudio.src = 'sounds/water-splash.wav';
+            break;
+        case ('win') :
+            myAudio.src = 'sounds/win.mp3';
             break;
     }
     myAudio.play();
