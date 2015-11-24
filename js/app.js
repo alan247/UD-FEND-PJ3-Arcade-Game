@@ -1,16 +1,3 @@
-var playAudio = function(type) {
-    var myAudio = document.createElement("audio");
-    switch (type) {
-        case ('collision') :
-            myAudio.src = 'sounds/hurt.wav';
-            break;
-        case ('gem') :
-            myAudio.src = 'sounds/gem.wav';
-            break;
-    }
-    myAudio.play();
-};
-
 // Enemy
 var Enemy = function(rowCount) {
     this.x = -202;
@@ -47,6 +34,13 @@ var Player = function(x, y) {
     this.x = x;
     this.y = y;
     this.sprite = 'images/char-boy.png';
+    this.score = 0;
+
+    var h2 = document.createElement('h2');
+    var text = document.createTextNode("Score: " + this.score);
+    h2.setAttribute('id', 'score');
+    h2.appendChild(text);
+    document.body.appendChild(h2);
 };
 
 Player.prototype.update = function() {
@@ -59,6 +53,11 @@ Player.prototype.update = function() {
 
 Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+};
+
+Player.prototype.scoreUpdate = function(points) {
+    var newScore = this.score += points;
+    document.getElementById('score').firstChild.nodeValue = 'Score: ' + newScore;
 };
 
 Player.prototype.handleInput = function(key) {
@@ -95,6 +94,7 @@ Gem.prototype.update = function() {
         playAudio('gem');
         this.x = undefined;
         this.y = undefined;
+        player.scoreUpdate(100);
         gem = new Gem();
     }
 }
@@ -103,10 +103,23 @@ Gem.prototype.render = function () {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
+var playAudio = function(type) {
+    var myAudio = document.createElement("audio");
+    switch (type) {
+        case ('collision') :
+            myAudio.src = 'sounds/hurt.wav';
+            break;
+        case ('gem') :
+            myAudio.src = 'sounds/gem.wav';
+            break;
+    }
+    myAudio.play();
+};
+
+
+
 var allEnemies = [];
 var player = new Player(404,400);
-var enemy = new Enemy(0, 135);
-var enemy2 = new Enemy(50, 135)
 var gem = new Gem();
 for (var i = 0; i < 4; i++) {
     allEnemies.push(new Enemy(i));
