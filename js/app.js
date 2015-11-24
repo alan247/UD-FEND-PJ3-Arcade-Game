@@ -47,8 +47,13 @@ Player.prototype.update = function() {
     // Prevent player from going off the canvas
     if (this.x > 404) this.x = 404;
     if (this.x < 0) this.x = 0;
-    if (this.y < -25) this.y = -25;
     if (this.y > 400) this.y = 400;
+
+    // Control events after player gets into water
+    if (this.y < 60) {
+        this.y = 400;
+        playAudio('water');
+    }
 };
 
 Player.prototype.render = function() {
@@ -111,6 +116,9 @@ var playAudio = function(type) {
             break;
         case ('gem') :
             myAudio.src = 'sounds/gem.wav';
+            break;
+        case ('water') :
+            myAudio.src = 'sounds/water-splash.wav';
             break;
     }
     myAudio.play();
