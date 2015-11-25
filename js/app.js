@@ -1,19 +1,95 @@
+// Set constants
 var TILE_WIDTH = 101,
-    TILE_HEIGHT = 85;
+    TILE_HEIGHT = 85,
+    PLAYER_INITAL_X = 202,
+    PLAYER_INITIAL_Y = 404,
+    ENEMY_SPRITE = 'images/enemy-bug.png',
+    PLAYER_SPRITE = 'images/char-boy.png',
+    GEM_SPRITE = 'images/gem-blue.png';
+
+// Item superclass
+var Item = function(sprite) {
+
+    // Set sprite
+    this.sprite = sprite;
+};
+
+// Render items method
+Item.prototype.render = function() {
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+};
+
+// Reset method
+Item.prototype.reset = function(type, rowCount) {
+
+    // If type is player, send player to inital position
+    if (type === 'player') {
+        this.x = PLAYER_INITAL_X;
+        this.y = PLAYER_INITIAL_Y;
+    }
+
+    // If type is gem, send gem to random position
+    if (type === 'gem') {
+        this.x = Math.floor(Math.random() * (5-1) +1) * TILE_WIDTH;
+        this.y = Math.floor(Math.random() * (4 - 0)) * TILE_HEIGHT + 60;
+    }
+
+    // If type is enemies, make enemies appear on stone blocks
+    if (type === 'enemies') {
+        this.x = -202;
+        this.y = rowCount * TILE_HEIGHT + 60;
+    }
+};
+
+// Check collision method
+Item.prototype.checkCollision = function(type) {
+    if (this.x > player.x - 80
+        && this.x < player.x + TILE_WIDTH
+        && this.y === player.y
+        ) {
+
+        // Play collision sound
+        playSound(type);
+
+        // If collission is with an enemy...
+        if (type === 'enemy'){
+
+            // reset player to initial location
+            player.reset('player');
+
+            // Lose one life
+            player.livesUpdate();
+        }
+
+        // If collision is with a gem...
+        if (type === 'gem'){
+
+            // Update score
+            player.scoreUpdate(100);
+
+            // Create a new gem in a random position
+             this.reset('gem');
+        }
+    }
+};
 
 // Class to generate enemies
 var Enemy = function(rowCount) {
-    // Set enemie's location
-    this.x = -202;
-    this.y = rowCount * TILE_HEIGHT + 60;
+
+    // Make enemies appear
+    this.reset('enemies', rowCount);
 
     // Set speed by generating to a random generated number
     // between 80 and 300
     this.speed = Math.floor(Math.random() * (300 - 80)) + 80;
 
-    // Enemy png image
-    this.sprite = 'images/enemy-bug.png';
+    // Call superclass and set sprite
+    Item.call(this, ENEMY_SPRITE);
 };
+
+// Send failed lookups to superclass prototype
+Enemy.prototype = Object.create(Item.prototype);
+Enemy.prototype.constructor = Player;
 
 // Enemy update method
 Enemy.prototype.update = function(dt) {
@@ -22,44 +98,23 @@ Enemy.prototype.update = function(dt) {
     // time delta
     this.x += this.speed * dt;
 
-    // Collision management. Check if enemy is in the same
-    // location as the player
-    if (this.x > player.x - 80
-        && this.x < player.x + TILE_WIDTH
-        && this.y === player.y
-        ) {
-
-        // If player and enemy are in the same location,
-        // reset player to initial location
-        player.reset();
-
-        // Play enemy collision sound
-        playAudio('collision');
-
-        // Lose one life when there's a collision with
-        // the player
-        player.livesUpdate();
-    }
+    // Check if there's a collision
+    this.checkCollision('enemy');
 
     // Return enemies to start point when end of canvas
     // reached
     if (this.x > 505) this.x = -202;
 };
 
-// Draw the enemy on the screen, required method for game
-Enemy.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-};
 
 // Class to generate player
 var Player = function() {
 
-    // Set player initial location
-    this.x = 202;
-    this.y = 400;
+    // Send sprite to superclass
+    Item.call(this, PLAYER_SPRITE);
 
-    // Set player image
-    this.sprite = 'images/char-boy.png';
+    // Set player to initial position
+    this.reset('player');
 
     // Set initial score
     this.score = 0;
@@ -67,7 +122,7 @@ var Player = function() {
     // Set initial amount of player's lives
     this.lives = 5;
 
-    // Add score to the DOM
+    // Add empty score to the DOM
     var HTMLscore = document.createElement('div');
     HTMLscore.innerHTML = 'SCORE: ' + this.score;
     HTMLscore.setAttribute('id', 'score');
@@ -79,6 +134,10 @@ var Player = function() {
     HTMLlives.setAttribute('id', 'lives');
     document.body.appendChild(HTMLlives);
 };
+
+// Send failed lookups to superclass prototype
+Player.prototype = Object.create(Item.prototype);
+Player.prototype.constructor = Player;
 
 // Player update method
 Player.prototype.update = function() {
@@ -92,19 +151,14 @@ Player.prototype.update = function() {
     if (this.y < 60) {
 
         // Reset player to initial location
-        this.reset();
+        this.reset('player');
 
         // Play water collision sound
-        playAudio('water');
+        playSound('water');
 
         // Lose one life after contact with water
         this.livesUpdate();
     }
-};
-
-// Draw player on screen
-Player.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
 // Method to update player's score
@@ -114,7 +168,7 @@ Player.prototype.scoreUpdate = function(points) {
     var newScore = this.score += points;
 
     // Update DOM with new score
-    document.getElementById('score').firstChild.nodeValue = 'SCORE: ' + newScore;
+    document.getElementById('score').innerHTML = 'SCORE: ' + newScore;
 };
 
 // Method to update player's lives
@@ -124,13 +178,13 @@ Player.prototype.livesUpdate = function() {
     this.lives--;
 
     // Update DOM with current lives
-    document.getElementById('lives').firstChild.nodeValue = 'LIVES: ' + this.lives;
+    document.getElementById('lives').innerHTML = 'LIVES: ' + this.lives;
 
     // Check if there are lives left
     if (this.lives === 0) {
 
         // Play endgame sound
-        playAudio('endgame');
+        playSound('endgame');
 
         // Remove player, gems and enemies
         gem.x = undefined;
@@ -143,12 +197,6 @@ Player.prototype.livesUpdate = function() {
         document.getElementById('end').style.display = 'block';
         document.getElementById('final-score').innerHTML = this.score;
     }
-};
-
-// Method to send player to initial position
-Player.prototype.reset = function() {
-    this.x = 202;
-    this.y = 400;
 };
 
 // Method to handle input keys and move the player accordingly
@@ -170,61 +218,35 @@ Player.prototype.handleInput = function(key) {
     }
 };
 
+
 // Class to manage gems
 var Gem = function () {
 
-    // Call reset method to make Gem appear in random location
-    this.reset();
+    // Send sprite to superclass
+    Item.call(this, GEM_SPRITE);
 
-    // Set gem image
-    this.sprite = 'images/gem-blue.png';
+    // Set gem in random position
+    this.reset('gem');
 };
+
+// Set failed lookups to superclass prototype
+Gem.prototype = Object.create(Item.prototype);
+Gem.prototype.constructor = Gem;
 
 // Gem's update method
 Gem.prototype.update = function() {
 
-    // Collision management. Check if gem is in the same
-    // location as the player
-    if (this.x > player.x - 80
-        && this.x < player.x + TILE_WIDTH
-        && this.y === player.y
-        ) {
-
-        // If true, play gem collision sound
-        playAudio('gem');
-
-        // Update score by 100 points
-        player.scoreUpdate(100);
-
-        // Create a new gem in a random position
-        this.reset();
-    }
+    // Check if gem is in the same location as the player
+    this.checkCollision('gem');
 }
 
-// Gems reset method
-Gem.prototype.reset = function () {
-
-    // Set gem in random location on stone blocks only
-    this.x = Math.floor(Math.random() * (5-1) +1) * TILE_WIDTH;
-    this.y = Math.floor(Math.random() * (4 - 0)) * TILE_HEIGHT + 60;
-};
-
-// Draw gem on screen
-Gem.prototype.render = function () {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-};
-
 // Method to play sound effects
-var playAudio = function(type) {
-
-    // Create <audio> element on DOM
-    var myAudio;
+var playSound = function(type) {
 
     // Check what sound is required by the 'type' argument
-    // passed to the method and set the correct file
-    // source
+    // passed to the method and play it
     switch (type) {
-        case ('collision') :
+        case ('enemy') :
             var collisionAudio = document.createElement('audio');
             collisionAudio.src = 'sounds/hurt.wav';
             collisionAudio.play();
@@ -245,8 +267,6 @@ var playAudio = function(type) {
             endgameSound.play();
             break;
     }
-
-
 };
 
 // Method that allows to play again after 'Play again' button
@@ -262,10 +282,10 @@ var playAgain = function() {
     }
 
     // Send player to initial position
-    player.reset();
+    player.reset('player');
 
     // Display a gem in a random position
-    gem.reset();
+    gem.reset('gem');
 
     // Reset score and lives counters
     document.getElementById('score').innerHTML = 'SCORE: 0';
