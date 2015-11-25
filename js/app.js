@@ -1,8 +1,11 @@
+var TILE_WIDTH = 101,
+    TILE_HEIGHT = 85;
+
 // Class to generate enemies
 var Enemy = function(rowCount) {
     // Set enemie's location
     this.x = -202;
-    this.y = rowCount * 85 + 60;
+    this.y = rowCount * TILE_HEIGHT + 60;
 
     // Set speed by generating to a random generated number
     // between 80 and 300
@@ -22,7 +25,7 @@ Enemy.prototype.update = function(dt) {
     // Collision management. Check if enemy is in the same
     // location as the player
     if (this.x > player.x - 80
-        && this.x < player.x + 101
+        && this.x < player.x + TILE_WIDTH
         && this.y === player.y
         ) {
 
@@ -66,16 +69,14 @@ var Player = function() {
 
     // Add score to the DOM
     var HTMLscore = document.createElement('div');
-    var scoreText = document.createTextNode("SCORE: " + this.score );
+    HTMLscore.innerHTML = 'SCORE: ' + this.score;
     HTMLscore.setAttribute('id', 'score');
-    HTMLscore.appendChild(scoreText);
     document.body.appendChild(HTMLscore);
 
     // Add lives to the DOM
     var HTMLlives = document.createElement('div');
-    var livesText = document.createTextNode("LIVES: " + this.lives);
+    HTMLlives.innerHTML = 'LIVES: ' + this.lives;
     HTMLlives.setAttribute('id', 'lives');
-    HTMLlives.appendChild(livesText);
     document.body.appendChild(HTMLlives);
 };
 
@@ -155,16 +156,16 @@ Player.prototype.handleInput = function(key) {
 
     switch(key) {
         case 'left':
-            this.x -= 101;
+            this.x -= TILE_WIDTH;
             break;
         case 'right':
-            this.x += 101;
+            this.x += TILE_WIDTH;
             break;
         case 'up':
-            this.y -= 85;
+            this.y -= TILE_HEIGHT;
             break;
         case 'down':
-            this.y += 85;
+            this.y += TILE_HEIGHT;
             break;
     }
 };
@@ -172,9 +173,8 @@ Player.prototype.handleInput = function(key) {
 // Class to manage gems
 var Gem = function () {
 
-    // Set gem in random location on stone blocks only
-    this.x = Math.floor(Math.random() * (5-1) +1) * 101;
-    this.y = Math.floor(Math.random() * (4 - 0)) * 85 + 60;
+    // Call reset method to make Gem appear in random location
+    this.reset();
 
     // Set gem image
     this.sprite = 'images/gem-blue.png';
@@ -186,24 +186,28 @@ Gem.prototype.update = function() {
     // Collision management. Check if gem is in the same
     // location as the player
     if (this.x > player.x - 80
-        && this.x < player.x + 101
+        && this.x < player.x + TILE_WIDTH
         && this.y === player.y
         ) {
 
         // If true, play gem collision sound
         playAudio('gem');
 
-        // Remove gem from screen
-        this.x = undefined;
-        this.y = undefined;
-
         // Update score by 100 points
         player.scoreUpdate(100);
 
         // Create a new gem in a random position
-        gem = new Gem();
+        this.reset();
     }
 }
+
+// Gems reset method
+Gem.prototype.reset = function () {
+
+    // Set gem in random location on stone blocks only
+    this.x = Math.floor(Math.random() * (5-1) +1) * TILE_WIDTH;
+    this.y = Math.floor(Math.random() * (4 - 0)) * TILE_HEIGHT + 60;
+};
 
 // Draw gem on screen
 Gem.prototype.render = function () {
@@ -216,27 +220,27 @@ var playAudio = function(type) {
     // Create <audio> element on DOM
     var myAudio;
 
-    // Check what sound is required by the "type" argument
+    // Check what sound is required by the 'type' argument
     // passed to the method and set the correct file
     // source
     switch (type) {
         case ('collision') :
-            var collisionAudio = document.createElement("audio");
+            var collisionAudio = document.createElement('audio');
             collisionAudio.src = 'sounds/hurt.wav';
             collisionAudio.play();
             break;
         case ('gem') :
-            var gemAudio = document.createElement("audio");
+            var gemAudio = document.createElement('audio');
             gemAudio.src = 'sounds/gem.wav';
             gemAudio.play();
             break;
         case ('water') :
-            var waterSound = document.createElement("audio");
+            var waterSound = document.createElement('audio');
             waterSound.src = 'sounds/water-splash.wav';
             waterSound.play();
             break;
         case ('endgame') :
-            var endgameSound = document.createElement("audio");
+            var endgameSound = document.createElement('audio');
             endgameSound.src = 'sounds/win.mp3';
             endgameSound.play();
             break;
@@ -245,7 +249,7 @@ var playAudio = function(type) {
 
 };
 
-// Method that allows to play again after "Play again" button
+// Method that allows to play again after 'Play again' button
 // is clicked on the final score modal window
 var playAgain = function() {
 
@@ -261,12 +265,11 @@ var playAgain = function() {
     player.reset();
 
     // Display a gem in a random position
-    gem.x = Math.floor(Math.random() * (5-1) +1) * 101;
-    gem.y = Math.floor(Math.random() * (4 - 0)) * 85 + 60;
+    gem.reset();
 
     // Reset score and lives counters
-    document.getElementById('score').firstChild.nodeValue = 'SCORE: 0';
-    document.getElementById('lives').firstChild.nodeValue = 'LIVES: 5';
+    document.getElementById('score').innerHTML = 'SCORE: 0';
+    document.getElementById('lives').innerHTML = 'LIVES: 5';
     player.score = 0;
     player.lives = 5;
 };
