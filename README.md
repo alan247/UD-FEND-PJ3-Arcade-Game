@@ -16,6 +16,6 @@ Thanks to GitHub Pages, all you have to do is to follow [this link](https://alan
 
 In order to play, you only need to use your arrow keys. The whole thing is very intuitive, yo won't have any troubles with it, I'm sure.
 
-Of course, you can also download all the files and play locally on your own computer, although I don't know why you would want to do that, unless, of course, you want to modify the code and add new features, something that I really encourage you to do. The code is thoroughly commented and it shouldn't be hard to discover what's going on under the hood. However, if you want to use this code, please fork the repository instead and if you develop some cool features, don't doubt to send pull requests.
+Of course, you can also download all the files and play locally on your own computer (in which case, you just need to open the index.html file), although I don't know why you would want to do that, unless, of course, you want to modify the code and add new features, something that I really encourage you to do. The code is thoroughly commented and it shouldn't be hard to discover what's going on under the hood. However, if you want to use this code, please fork the repository instead and if you develop some cool features, don't doubt to send pull requests.
 
 **Thanks for playing!**
