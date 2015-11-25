@@ -97,7 +97,7 @@ Player.prototype.update = function() {
         playAudio('water');
 
         // Lose one life after contact with water
-        player.livesUpdate();
+        this.livesUpdate();
     }
 };
 
@@ -134,8 +134,8 @@ Player.prototype.livesUpdate = function() {
         // Remove player, gems and enemies
         gem.x = undefined;
         gem.y = undefined;
-        player.x = undefined;
-        player.y = undefined;
+        this.x = undefined;
+        this.y = undefined;
         allEnemies = [];
 
         // Display message with final score and option to play again
@@ -155,16 +155,16 @@ Player.prototype.handleInput = function(key) {
 
     switch(key) {
         case 'left':
-            player.x -= 101;
+            this.x -= 101;
             break;
         case 'right':
-            player.x += 101;
+            this.x += 101;
             break;
         case 'up':
-            player.y -= 85;
+            this.y -= 85;
             break;
         case 'down':
-            player.y += 85;
+            this.y += 85;
             break;
     }
 };
@@ -214,28 +214,35 @@ Gem.prototype.render = function () {
 var playAudio = function(type) {
 
     // Create <audio> element on DOM
-    var myAudio = document.createElement("audio");
+    var myAudio;
 
     // Check what sound is required by the "type" argument
     // passed to the method and set the correct file
     // source
     switch (type) {
         case ('collision') :
-            myAudio.src = 'sounds/hurt.wav';
+            var collisionAudio = document.createElement("audio");
+            collisionAudio.src = 'sounds/hurt.wav';
+            collisionAudio.play();
             break;
         case ('gem') :
-            myAudio.src = 'sounds/gem.wav';
+            var gemAudio = document.createElement("audio");
+            gemAudio.src = 'sounds/gem.wav';
+            gemAudio.play();
             break;
         case ('water') :
-            myAudio.src = 'sounds/water-splash.wav';
+            var waterSound = document.createElement("audio");
+            waterSound.src = 'sounds/water-splash.wav';
+            waterSound.play();
             break;
         case ('endgame') :
-            myAudio.src = 'sounds/win.mp3';
+            var endgameSound = document.createElement("audio");
+            endgameSound.src = 'sounds/win.mp3';
+            endgameSound.play();
             break;
     }
 
-    // Play selected file
-    myAudio.play();
+
 };
 
 // Method that allows to play again after "Play again" button
