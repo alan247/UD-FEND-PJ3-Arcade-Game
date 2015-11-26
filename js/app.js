@@ -17,6 +17,35 @@ Item.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
+// Method to play sound effects
+Item.prototype.playSound = function(type) {
+
+    // Check what sound is required by the 'type' argument
+    // passed to the method and play it
+    switch (type) {
+        case 'enemy' :
+            var collisionAudio = document.createElement('audio');
+            collisionAudio.src = 'sounds/hurt.wav';
+            collisionAudio.play();
+            break;
+        case 'gem' :
+            var gemAudio = document.createElement('audio');
+            gemAudio.src = 'sounds/gem.wav';
+            gemAudio.play();
+            break;
+        case 'water' :
+            var waterSound = document.createElement('audio');
+            waterSound.src = 'sounds/water-splash.wav';
+            waterSound.play();
+            break;
+        case 'endgame' :
+            var endgameSound = document.createElement('audio');
+            endgameSound.src = 'sounds/win.mp3';
+            endgameSound.play();
+            break;
+    }
+};
+
 // Class to generate enemies
 var Enemy = function(rowCount) {
 
@@ -69,7 +98,7 @@ Enemy.prototype.hasCollided = function(item) {
         ) {
 
         // Play collision sound
-        playSound('enemy');
+        this.playSound('enemy');
 
        // Reset player to initial location
         item.reset();
@@ -135,7 +164,7 @@ Player.prototype.update = function() {
         this.reset();
 
         // Play water collision sound
-        playSound('water');
+        this.playSound('water');
 
         // Lose one life after contact with water
         this.livesUpdate();
@@ -165,7 +194,7 @@ Player.prototype.livesUpdate = function() {
     if (this.lives === 0) {
 
         // Play endgame sound
-        playSound('endgame');
+        this.playSound('endgame');
 
         // Remove player, gems and enemies
         gem.x = undefined;
@@ -239,42 +268,13 @@ Gem.prototype.hasCollided = function(item) {
         ) {
 
         // Play collision sound
-        playSound('gem');
+        this.playSound('gem');
 
         // Update score
         item.scoreUpdate(100);
 
         // Create a new gem in a random position
         this.reset();
-    }
-};
-
-// Method to play sound effects
-var playSound = function(type) {
-
-    // Check what sound is required by the 'type' argument
-    // passed to the method and play it
-    switch (type) {
-        case ('enemy') :
-            var collisionAudio = document.createElement('audio');
-            collisionAudio.src = 'sounds/hurt.wav';
-            collisionAudio.play();
-            break;
-        case ('gem') :
-            var gemAudio = document.createElement('audio');
-            gemAudio.src = 'sounds/gem.wav';
-            gemAudio.play();
-            break;
-        case ('water') :
-            var waterSound = document.createElement('audio');
-            waterSound.src = 'sounds/water-splash.wav';
-            waterSound.play();
-            break;
-        case ('endgame') :
-            var endgameSound = document.createElement('audio');
-            endgameSound.src = 'sounds/win.mp3';
-            endgameSound.play();
-            break;
     }
 };
 
