@@ -12,7 +12,7 @@ You have 5 lives. Once you used them all you will get your final score and you w
 
 ## 2. How to play?
 
-Thanks to GitHub Pages, all you have to do is to follow [this link](https://alan247.github.io/frogger) and the game will load on your browser.
+Thanks to GitHub Pages, all you have to do is to follow [this link](http://alan247.github.io/UD-FEND-PJ3-Arcade-Game/) and the game will load on your browser.
 
 In order to play, you only need to use your arrow keys. The whole thing is very intuitive, yo won't have any troubles with it, I'm sure.
 
